@@ -1,14 +1,14 @@
 name: roko_query
 type: module
 author: aliveai
-version: 0.1
+version: 0.4
 description: Naptha node module for querying Roko vector db
 license: MIT
 
 models:
   default_model_provider: ollama
   ollama: 
-    model: llama3
+    model: phi3:mini
     max_tokens: 1000
     temperature: 0
     api_base: http://localhost:11434

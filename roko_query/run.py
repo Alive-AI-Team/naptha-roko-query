@@ -32,7 +32,8 @@ def run(
     collections = client.list_collections()
     existing_collection_names = [x.name for x in collections]
     if collection_name in existing_collection_names:
-        collection = client.get_collection(name=collection_name, embedding_function=ef)
+        # collection = client.get_collection(name=collection_name, embedding_function=ef)
+        collection = client.get_collection(name=collection_name)
         num = f"{collection_name} has {collection.count()} entries"
         logger.info(num)
 
