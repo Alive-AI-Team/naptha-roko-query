@@ -8,7 +8,7 @@ license: MIT
 models:
   default_model_provider: ollama
   ollama: 
-    model: phi3:mini
+    model: phi
     max_tokens: 1000
     temperature: 0
     api_base: http://localhost:11434
