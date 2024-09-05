@@ -10,6 +10,9 @@ logger = get_logger(__name__)
 
 def run(
     inputs: InputSchema,
+    worker_nodes=None,
+    orchestrator_node=None,
+    flow_run=None,
     cfg=None,
 ):
     """Run a query using RAG against Roko's social media streams
