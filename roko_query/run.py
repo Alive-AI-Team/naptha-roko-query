@@ -63,5 +63,5 @@ def run(
     )
     response = completion.choices[0].message.content
 
-    return response
+    return str(messages) + response
 
