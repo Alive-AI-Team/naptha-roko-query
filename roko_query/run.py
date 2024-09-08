@@ -49,10 +49,12 @@ def run(
 
     else:
         logger.warning(f"Error: Collection {collection_name} not found.")
+        logger.warning(f"Collections = {existing_collection_names}")
 
     messages.append({"role": "user", "content": inputs.question})
 
-    logger.debug(messages)
+    # lets make sure we can see this:
+    logger.warning(messages)
 
     client = OpenAI()
     completion = client.chat.completions.create(
