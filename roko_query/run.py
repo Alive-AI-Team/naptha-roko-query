@@ -5,7 +5,7 @@ import chromadb
 from openai import OpenAI
 from pathlib import Path
 
-logger = get_logger(__name__)
+logger = get_logger("ROKO_QUERY")
 
 
 def run(
@@ -54,7 +54,7 @@ def run(
     messages.append({"role": "user", "content": inputs.question})
 
     # lets make sure we can see this:
-    logger.warning(messages)
+    logger.error(messages)
 
     client = OpenAI()
     completion = client.chat.completions.create(
