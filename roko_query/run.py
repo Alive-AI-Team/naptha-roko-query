@@ -51,17 +51,24 @@ def run(
         logger.warning(f"Error: Collection {collection_name} not found.")
         logger.warning(f"Collections = {existing_collection_names}")
 
-    messages.append({"role": "user", "content": inputs.question})
+    # if the message starts with "debug:" then also return
+    # the message queue for analysis:
+    debug = inputs.question[:6] == "debug:"
+    if debug:
+        inputs.question = inputs.question[6:]
 
-    # lets make sure we can see this:
-    logger.error(messages)
+    messages.append({"role": "user", "content": inputs.question})
 
     client = OpenAI()
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=messages
     )
+
     response = completion.choices[0].message.content
 
-    return str(messages) + response
+    if debug:
+        response = str(messages) + "\n\n" + response 
+
+    return response
 
