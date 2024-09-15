@@ -2,8 +2,10 @@
 from roko_query.schemas import InputSchema
 from naptha_sdk.utils import get_logger
 import chromadb
+from chromadb.utils import embedding_functions
 from openai import OpenAI
 from pathlib import Path
+import os
 
 logger = get_logger("ROKO_QUERY")
 
@@ -19,7 +21,7 @@ def run(
 
     Args:
         inputs (InputSchema): input_dir is expected to contain "chroma.db" a vector
-        database 
+        database
 
     Returns:
         str: Query response
@@ -32,13 +34,17 @@ def run(
     client = chromadb.PersistentClient(path=str(path))
     collection_name = cfg["chroma"]["collection"]
 
+    ef = embedding_functions.OpenAIEmbeddingFunction(
+        api_key=os.environ["OPENAI_API_KEY"], model_name="text-embedding-3-small"
+    )
+
     # Set the prompt
     messages = [{"role": "system", "content": cfg["inputs"]["system_message"]}]
 
     collections = client.list_collections()
     existing_collection_names = [x.name for x in collections]
     if collection_name in existing_collection_names:
-        collection = client.get_collection(name=collection_name)
+        collection = client.get_collection(name=collection_name, embedding_function=ef)
         num = f"{collection_name} has {collection.count()} entries"
         logger.info(num)
 
@@ -60,15 +66,11 @@ def run(
     messages.append({"role": "user", "content": inputs.question})
 
     client = OpenAI()
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=messages
-    )
+    completion = client.chat.completions.create(model="gpt-4o-mini", messages=messages)
 
     response = completion.choices[0].message.content
 
     if debug:
-        response = str(messages) + "\n\n" + response 
+        response = str(messages) + "\n\n" + response
 
     return response
-
