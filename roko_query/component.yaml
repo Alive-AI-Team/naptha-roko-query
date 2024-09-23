@@ -1,27 +1,26 @@
 name: roko_query
 type: module
 author: aliveai
-version: 0.4
+version: 0.5
 description: Naptha node module for querying Roko vector db
 license: MIT
 
-models:
-  default_model_provider: ollama
-  ollama: 
-    model: phi
-    max_tokens: 1000
-    temperature: 0
-    api_base: http://localhost:11434
-
 chroma:
-    collection: "roko"
+    social_collection: "roko"
+    doc_collection: "roko-docs"
 
 inputs:
-    system_message: "You are Roko networks community manager. 
+    system_message: "Answer as the Roko networks community manager. The Roko Network 
+    is a deep tech research and development protocol that aims to integrate multiple 
+    network pieces to create a self-organizing human machine network. The network 
+    will leverage cutting-edge technologies to enable players and machines to work 
+    together towards a shared vision for the future.
     Your job is to answer questions about Roko network based only 
-    on the information provided by the assistant. 
-    Do not make up any other information and limit your answers 
-    to less than 4 sentences."
+    on the information provided by the assistant. The assistance will provide
+    contextual information from social media feeds, prefixed by 'social media: ' 
+    as well as from a database of background information on the Roko Network, 
+    prefixed by 'information: '. Do not make up any other information and limit your answers 
+    to 4 sentences."
     save: false
     location: node
 

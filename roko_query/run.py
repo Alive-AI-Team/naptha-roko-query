@@ -6,8 +6,9 @@ from chromadb.utils import embedding_functions
 from openai import OpenAI
 from pathlib import Path
 import os
+import json
 
-logger = get_logger("ROKO_QUERY")
+logger = get_logger(__name__)
 
 
 def run(
@@ -27,12 +28,8 @@ def run(
         str: Query response
     """
 
-    logger.info(f"Inputs: {inputs}")
-    logger.debug(f"config = {cfg}")
-
     path = Path(inputs.input_dir) / "chroma.db"
     client = chromadb.PersistentClient(path=str(path))
-    collection_name = cfg["chroma"]["collection"]
 
     ef = embedding_functions.OpenAIEmbeddingFunction(
         api_key=os.environ["OPENAI_API_KEY"], model_name="text-embedding-3-small"
@@ -41,21 +38,19 @@ def run(
     # Set the prompt
     messages = [{"role": "system", "content": cfg["inputs"]["system_message"]}]
 
-    collections = client.list_collections()
-    existing_collection_names = [x.name for x in collections]
-    if collection_name in existing_collection_names:
-        collection = client.get_collection(name=collection_name, embedding_function=ef)
-        num = f"{collection_name} has {collection.count()} entries"
-        logger.info(num)
+    social_collection = client.get_collection(name=cfg["chroma"]["social_collection"], 
+                                              embedding_function=ef)
+    logger.info(f"Social collection has {social_collection.count()} entries.")
+    results = social_collection.query(query_texts=inputs.question, n_results=10)
+    for doc in results["documents"][0]:
+        messages.append({"role": "assistant", "content": "social media: " + doc})
 
-        # put vector db results into query:
-        results = collection.query(query_texts=inputs.question, n_results=10)
-        for doc in results["documents"][0]:
-            messages.append({"role": "assistant", "content": doc})
-
-    else:
-        logger.warning(f"Error: Collection {collection_name} not found.")
-        logger.warning(f"Collections = {existing_collection_names}")
+    doc_collection = client.get_collection(name=cfg["chroma"]["doc_collection"], 
+                                           embedding_function=ef)
+    logger.info(f"Doc collection has {doc_collection.count()} entries.")
+    results = doc_collection.query(query_texts=inputs.question, n_results=5)
+    for doc in results["documents"][0]:
+        messages.append({"role": "assistant", "content": "information: " + doc})
 
     # if the message starts with "debug:" then also return
     # the message queue for analysis:
@@ -71,6 +66,8 @@ def run(
     response = completion.choices[0].message.content
 
     if debug:
-        response = str(messages) + "\n\n" + response
+        with open("messages.json", "w") as fp:
+            json.dump(messages, fp, indent=2)
+
 
     return response
