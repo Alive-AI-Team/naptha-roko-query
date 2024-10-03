@@ -11,13 +11,7 @@ import json
 logger = get_logger(__name__)
 
 
-def run(
-    inputs: InputSchema,
-    worker_nodes=None,
-    orchestrator_node=None,
-    flow_run=None,
-    cfg=None,
-):
+def run(inputs, *args, **kwargs):
     """Run a query using RAG against Roko's social media streams
 
     Args:
@@ -27,6 +21,12 @@ def run(
     Returns:
         str: Query response
     """
+
+    if "cfg" not in kwargs.keys():
+        logger.error("Configuration error.")
+        return
+    
+    cfg = kwargs["cfg"]
 
     path = Path(inputs.input_dir) / "chroma.db"
     client = chromadb.PersistentClient(path=str(path))
