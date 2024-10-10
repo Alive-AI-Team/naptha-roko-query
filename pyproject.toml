@@ -10,7 +10,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-naptha-sdk = {git = "https://github.com/NapthaAI/naptha-sdk.git"}
 requests = "^2.31.0"
 pydantic = "^2.7.0"
 PyYAML = "^6.0.1"
